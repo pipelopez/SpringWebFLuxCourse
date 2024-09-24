@@ -17,6 +17,15 @@ public class Producto {
 	
 	private Date createAt;		
 	
+
+	public Producto() {}
+	
+	public Producto(String nombre, Double precio) {
+		super();
+		this.nombre = nombre;
+		this.precio = precio;
+	}
+		
 	public String getId() {
 		return id;
 	}
