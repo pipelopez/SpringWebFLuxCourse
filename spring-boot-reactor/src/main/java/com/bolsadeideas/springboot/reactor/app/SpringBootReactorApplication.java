@@ -1,7 +1,11 @@
 package com.bolsadeideas.springboot.reactor.app;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.CountDownLatch;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +31,77 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 	
 	@Override
 	public void run(String... args) throws Exception {
-		ejemploZipWithRangos();
+		ejemploIntervalDesdeCreate();
+	}
+	
+	public void ejemploIntervalDesdeCreate() {
+		Flux.create(emitter -> {
+			Timer timer = new Timer();
+			timer.schedule(new TimerTask() {
+				
+				private Integer contador = 0;
+				@Override 
+				public void run() {
+					emitter.next(++contador);
+					if(contador == 10 ) {
+						timer.cancel();
+						emitter.complete();
+					}
+					
+					if(contador == 5) {
+						timer.cancel();
+						emitter.error(new InterruptedException("Error, se ha detenido el flux en 5!"));
+					}
+				}
+			}, 1000, 1000);
+		})
+		/*.doOnNext(next -> log.info(next.toString()))
+		.doOnComplete(()-> log.info("Hemos terminado") )
+		.subscribe();*/
+		.subscribe(next -> log.info(next.toString()), 
+				error -> log.error(error.getMessage()),
+				() -> log.info("Hemos terminado"));
+		
+	}
+	
+	public void ejemploIntervalInfinito() throws InterruptedException {
+		
+		CountDownLatch latch = new CountDownLatch(1);
+		
+		Flux.interval(Duration.ofSeconds(1))
+		.doOnTerminate(latch::countDown)
+		.flatMap(i -> {
+			if(i >= 5) {
+				return Flux.error(new InterruptedException("Solo hasta 5!"));		
+			} else {
+				return Flux.just(i);
+			}
+		})
+		.map(i -> "Hola " + i)
+		.retry(2)
+		.subscribe(s -> log.info(s), e -> log.error(e.getMessage()));
+		
+		latch.await();	
+		
+	}
+	
+	public void ejemploDelayElements() /*throws InterruptedException*/ {
+		Flux<Integer> rango = Flux.range(1, 12)
+				.delayElements(Duration.ofSeconds(1))
+				.doOnNext(i -> log.info(i.toString()));
+		
+		rango.blockLast();		
+		
+		//Thread.sleep(13000);
+	}
+	
+	public void ejemploInterval() {
+		Flux<Integer> rango = Flux.range(1, 12);
+		Flux<Long> retraso = Flux.interval(Duration.ofSeconds(1));
+		
+		rango.zipWith(retraso, (ra, re)-> ra )
+		.doOnNext(i -> log.info(i.toString()))
+		.blockLast();
 	}
 	
 	public void ejemploZipWithRangos() {
