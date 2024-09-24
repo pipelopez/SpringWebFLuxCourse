@@ -1,5 +1,8 @@
 package com.bolsadeideas.springboot.reactor.app;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -9,6 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import com.bolsadeideas.springboot.reactor.app.models.Usuario;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @SpringBootApplication
 public class SpringBootReactorApplication implements CommandLineRunner {
@@ -21,7 +25,49 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 	
 	@Override
 	public void run(String... args) throws Exception {
-		Flux<String> nombres = Flux.just("Andres Guzman", "Jaime Fulano", "Pipe Sultano", "Diego Molano", "Pedro Ramirez", "Bruce Lee", "Bruce Willis");
+		ejemploFlatMap();
+	}
+	
+public void ejemploFlatMap() throws Exception {
+		
+		List<String> usuariosList = new ArrayList<>();
+		usuariosList.add("Andres Guzman");
+		usuariosList.add( "Jaime Fulano");
+		usuariosList.add("Pipe Sultano");
+		usuariosList.add("Diego Molano");
+		usuariosList.add("Pedro Ramirez");
+		usuariosList.add("Bruce Lee");
+		usuariosList.add("Bruce Willis");
+		
+		Flux.fromIterable(usuariosList)
+				.map(nombre -> new Usuario(nombre.split(" ")[0].toUpperCase(), nombre.split(" ")[1].toUpperCase()))
+				.flatMap(usuario -> {
+					if(usuario.getNombre().equalsIgnoreCase("bruce")) {
+						return Mono.just(usuario);
+					} else {
+						return Mono.empty();
+					}
+				})
+				.map(usuario -> {
+					String nombre =  usuario.getNombre().toLowerCase();
+					usuario.setNombre(nombre);
+					return usuario;
+					})
+				.subscribe(u -> log.info(u.toString()));
+	}
+	
+	public void ejemploIterable() throws Exception {
+		
+		List<String> usuariosList = new ArrayList<>();
+		usuariosList.add("Andres Guzman");
+		usuariosList.add( "Jaime Fulano");
+		usuariosList.add("Pipe Sultano");
+		usuariosList.add("Diego Molano");
+		usuariosList.add("Pedro Ramirez");
+		usuariosList.add("Bruce Lee");
+		usuariosList.add("Bruce Willis");
+		
+		Flux<String> nombres = Flux.fromIterable(usuariosList); /*Flux.just("Andres Guzman", "Jaime Fulano", "Pipe Sultano", "Diego Molano", "Pedro Ramirez", "Bruce Lee", "Bruce Willis");*/
 		
 		Flux<Usuario> usuarios = nombres.map(nombre -> new Usuario(nombre.split(" ")[0].toUpperCase(), nombre.split(" ")[1].toUpperCase()))
 				.filter(usuario -> usuario.getNombre().toLowerCase().equalsIgnoreCase("bruce"))
@@ -50,3 +96,5 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 	}
 
 }
+
+
