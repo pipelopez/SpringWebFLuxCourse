@@ -7,6 +7,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CountDownLatch;
 
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -31,7 +33,49 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 	
 	@Override
 	public void run(String... args) throws Exception {
-		ejemploIntervalDesdeCreate();
+		ejemploContraPresion();
+	}
+	
+	public void ejemploContraPresion() {
+		Flux.range(1, 10)
+		.log()
+		.limitRate(5)
+		.subscribe(/*new Subscriber<Integer>() {
+			
+			private Subscription s;			
+			
+			private Integer limite = 2;
+			private Integer consumido = 0;
+
+			@Override
+			public void onSubscribe(Subscription s) {
+				this.s = s;
+				s.request(limite);				
+			}
+
+			@Override
+			public void onNext(Integer t) {
+				log.info(t.toString());
+				consumido++;
+				if(consumido == limite) {
+					consumido = 0;
+					s.request(limite);
+				}
+			}
+
+			@Override
+			public void onError(Throwable t) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void onComplete() {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		}*/);
 	}
 	
 	public void ejemploIntervalDesdeCreate() {
@@ -48,16 +92,16 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 						emitter.complete();
 					}
 					
-					if(contador == 5) {
+					/*if(contador == 5) {
 						timer.cancel();
 						emitter.error(new InterruptedException("Error, se ha detenido el flux en 5!"));
-					}
+					}*/ //Así podemos manejar el caso de error
 				}
 			}, 1000, 1000);
 		})
 		/*.doOnNext(next -> log.info(next.toString()))
 		.doOnComplete(()-> log.info("Hemos terminado") )
-		.subscribe();*/
+		.subscribe();*/ // estas 3 líneas hacen lo mismo que el subscribe con los 3 parámetros
 		.subscribe(next -> log.info(next.toString()), 
 				error -> log.error(error.getMessage()),
 				() -> log.info("Hemos terminado"));
