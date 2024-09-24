@@ -25,7 +25,25 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 	
 	@Override
 	public void run(String... args) throws Exception {
-		ejemploToString();
+		ejemploCollectList();
+	}
+	
+public void ejemploCollectList() throws Exception {
+		
+		List<Usuario> usuariosList = new ArrayList<>();
+		usuariosList.add(new Usuario("Andres", "Guzman"));
+		usuariosList.add(new Usuario("Jaime", "Fulano"));
+		usuariosList.add(new Usuario("Pipe", "Sultano"));
+		usuariosList.add(new Usuario("Diego", "Molano"));
+		usuariosList.add(new Usuario("Pedro", "Ramirez"));
+		usuariosList.add(new Usuario("Bruce", "Lee"));
+		usuariosList.add(new Usuario("Bruce", "Willis"));
+		
+		Flux.fromIterable(usuariosList)
+		.collectList()
+		.subscribe(lista -> {
+			lista.forEach(item -> log.info(item.toString()));
+			});
 	}
 	
 public void ejemploToString() throws Exception {
