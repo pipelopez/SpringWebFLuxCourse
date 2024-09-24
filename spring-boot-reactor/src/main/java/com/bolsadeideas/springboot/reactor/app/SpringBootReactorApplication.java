@@ -39,8 +39,8 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 	public void ejemploContraPresion() {
 		Flux.range(1, 10)
 		.log()
-		.limitRate(5)
-		.subscribe(/*new Subscriber<Integer>() {
+		//.limitRate(5) // Hace lo mismo que el Subscriber
+		.subscribe(new Subscriber<Integer>() {
 			
 			private Subscription s;			
 			
@@ -75,7 +75,7 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 				
 			}
 			
-		}*/);
+		});
 	}
 	
 	public void ejemploIntervalDesdeCreate() {
