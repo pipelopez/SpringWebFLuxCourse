@@ -27,9 +27,17 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 	
 	@Override
 	public void run(String... args) throws Exception {
-		ejemploUsuarioComentariosZipWithForma2();
+		ejemploZipWithRangos();
 	}
 	
+	public void ejemploZipWithRangos() {
+		Flux<Integer> rangos = Flux.range(0, 4);
+		Flux.just(1,2,3,4)
+		.map(i -> (i*2))
+		.zipWith( rangos , (uno, dos) -> String.format("Primer Flux: %d, Segundo Flux: %d", uno, dos))
+		.subscribe(texto -> log.info(texto));
+		
+	}
 
 	public void ejemploUsuarioComentariosZipWithForma2() {
 		Mono<Usuario> usuarioMono = Mono.fromCallable(() -> new Usuario("John","Doe"));
