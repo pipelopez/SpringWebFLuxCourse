@@ -39,7 +39,7 @@ public class ProductoRestController {
 	@GetMapping("/{id}")
 	public Mono<Producto> show(@PathVariable String id){
 		
-		//Mono<Producto> producto = dao.findById(id);
+		//Mono<Producto> producto = dao.findById(id); // esta es la consulta directa a la DB con Mongo, es la más rápida
 		
 		Flux<Producto> productos = dao.findAll();
 		
