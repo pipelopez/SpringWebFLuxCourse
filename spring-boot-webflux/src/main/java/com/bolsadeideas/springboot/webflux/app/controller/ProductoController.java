@@ -105,6 +105,24 @@ public class ProductoController {
 		
 	}
 	
+	@GetMapping("/eliminar/{id}")
+	public Mono<String> eliminar(@PathVariable String id){
+		return service.findById(id)
+				.defaultIfEmpty(new Producto())
+				.flatMap(p -> {
+					if(p.getId() == null) {
+						return Mono.error(new InterruptedException("No existe el producto a eliminar"));
+					}else {
+						return Mono.just(p);
+					}
+				}).flatMap(service::delete /*p -> {
+					log.info("Eliminando producto: "+ p.getNombre());
+					log.info("Eliminando producto Id: "+ p.getId());
+			return service.delete(p);
+		}*/ /*El código comentado hace lo mismo que service::delete, solo que sin log*/).then(Mono.just("redirect:/listar?success=producto+aliminado+con+exito"))
+				.onErrorResume(ex -> Mono.just("redirect:/listar?error=no+existe+el+producto+a+eliminar"));
+	}
+	
 
 	@GetMapping("/listar-full")
 	public String listarFull(Model model) {
