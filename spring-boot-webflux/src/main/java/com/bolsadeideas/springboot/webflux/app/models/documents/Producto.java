@@ -6,14 +6,19 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+
 @Document(collection="productos")
 public class Producto {
 	
 	@Id
 	private String id;
 	
+	@NotEmpty
 	private String nombre;
 	
+	@NotNull
 	private Double precio;
 
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
