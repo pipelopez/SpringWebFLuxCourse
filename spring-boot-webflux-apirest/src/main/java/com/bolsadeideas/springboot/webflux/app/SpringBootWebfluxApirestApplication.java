@@ -9,6 +9,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+
 import com.bolsadeideas.springboot.webflux.app.models.documents.Categoria;
 import com.bolsadeideas.springboot.webflux.app.models.documents.Producto;
 import com.bolsadeideas.springboot.webflux.app.models.services.ProductoService;
@@ -16,7 +17,7 @@ import com.bolsadeideas.springboot.webflux.app.models.services.ProductoService;
 import reactor.core.publisher.Flux;
 
 @SpringBootApplication
-public class SpringBootWebfluxApplication implements CommandLineRunner {
+public class SpringBootWebfluxApirestApplication implements CommandLineRunner{
 	
 	@Autowired 
 	private ProductoService service;
@@ -24,10 +25,11 @@ public class SpringBootWebfluxApplication implements CommandLineRunner {
 	@Autowired
 	private ReactiveMongoTemplate mongoTemplate;
 	
-	private static final Logger log = LoggerFactory.getLogger(SpringBootWebfluxApplication.class);
+	private static final Logger log = LoggerFactory.getLogger(SpringBootWebfluxApirestApplication.class);
+
 
 	public static void main(String[] args) {
-		SpringApplication.run(SpringBootWebfluxApplication.class, args);
+		SpringApplication.run(SpringBootWebfluxApirestApplication.class, args);
 	}
 	
 	@Override
@@ -63,4 +65,5 @@ public class SpringBootWebfluxApplication implements CommandLineRunner {
 				).subscribe(producto -> log.info("Insert: " + producto.getId() + " " + producto.getNombre()));
 					
 	}
+
 }
