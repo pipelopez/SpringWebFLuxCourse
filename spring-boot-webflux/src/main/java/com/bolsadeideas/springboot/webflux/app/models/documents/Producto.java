@@ -24,15 +24,18 @@ public class Producto {
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date createAt;	
 	
-	private Categoria categoria;
-	
+	private Categoria categoria;	
 
 	public Producto() {}
 	
 	public Producto(String nombre, Double precio) {
-		super();
 		this.nombre = nombre;
 		this.precio = precio;
+	}
+	
+	public Producto(String nombre, Double precio, Categoria categoria) {
+		this(nombre, precio);
+		this.categoria = categoria;
 	}
 		
 	public String getId() {
