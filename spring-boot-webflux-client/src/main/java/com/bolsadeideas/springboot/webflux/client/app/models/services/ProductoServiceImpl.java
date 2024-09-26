@@ -67,7 +67,7 @@ public class ProductoServiceImpl implements ProductoService {
 	}
 
 	@Override
-	public Mono<Void> eliminar(String id) {
+	public Mono<Void> delete(String id) {
 		return client.delete().uri("/{id}", Collections.singletonMap("id", id))
 				.exchange()
 				.then();

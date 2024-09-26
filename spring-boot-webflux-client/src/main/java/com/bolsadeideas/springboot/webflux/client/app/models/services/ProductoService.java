@@ -15,6 +15,6 @@ public interface ProductoService {
 	
 	public Mono<Producto> update(Producto producto, String id);
 	
-	public Mono<Void> eliminar(String id);
+	public Mono<Void> delete(String id);
 
 }
