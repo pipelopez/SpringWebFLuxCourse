@@ -24,11 +24,11 @@ import reactor.core.publisher.Mono;
 public class ProductoServiceImpl implements ProductoService {
 
 	@Autowired
-	private WebClient client;
+	private WebClient.Builder client;
 	
 	@Override
 	public Flux<Producto> findAll() {
-		return client.get().accept(APPLICATION_JSON_UTF8)
+		return client.build().get().accept(APPLICATION_JSON_UTF8)
 				.exchange()
 				.flatMapMany(response -> response.bodyToFlux(Producto.class));
 	}
@@ -37,7 +37,7 @@ public class ProductoServiceImpl implements ProductoService {
 	public Mono<Producto> findById(String id) {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("id", id);
-		return client.get().uri("/{id}", params)
+		return client.build().get().uri("/{id}", params)
 				.accept(APPLICATION_JSON_UTF8)
 				.retrieve()
 				.bodyToMono(Producto.class);
@@ -47,7 +47,7 @@ public class ProductoServiceImpl implements ProductoService {
 
 	@Override
 	public Mono<Producto> save(Producto producto) {
-		return client.post()
+		return client.build().post()
 				.accept(APPLICATION_JSON_UTF8)
 				.contentType(APPLICATION_JSON_UTF8)
 				//.body(fromObject(producto)) // descomentar esta funciona igual que el syncbody, solo dejar una de las dos
@@ -62,7 +62,7 @@ public class ProductoServiceImpl implements ProductoService {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("id", id);
 		
-		return client.put()
+		return client.build().put()
 				.uri("/{id}", Collections.singletonMap("id", id))
 				.accept(APPLICATION_JSON_UTF8)
 				.contentType(APPLICATION_JSON_UTF8)
@@ -73,7 +73,7 @@ public class ProductoServiceImpl implements ProductoService {
 
 	@Override
 	public Mono<Void> delete(String id) {
-		return client.delete().uri("/{id}", Collections.singletonMap("id", id))
+		return client.build().delete().uri("/{id}", Collections.singletonMap("id", id))
 				.retrieve()
 				.bodyToMono(Void.class);
 	}
@@ -85,7 +85,7 @@ public class ProductoServiceImpl implements ProductoService {
 			h.setContentDispositionFormData("file", file.filename());
 		});
 		
-		return client.post()
+		return client.build().post()
 				.uri("/upload/{id}", Collections.singletonMap("id", id))
 				.contentType(MULTIPART_FORM_DATA)
 				.syncBody(parts.build())
