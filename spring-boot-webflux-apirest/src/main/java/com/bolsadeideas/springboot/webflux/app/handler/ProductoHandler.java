@@ -6,6 +6,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.FormFieldPart;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.Validator;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.Errors;
+
 import static org.springframework.web.reactive.function.BodyInserters.*;
 
 import java.io.File;
@@ -20,6 +24,7 @@ import com.bolsadeideas.springboot.webflux.app.models.documents.Categoria;
 import com.bolsadeideas.springboot.webflux.app.models.documents.Producto;
 import com.bolsadeideas.springboot.webflux.app.models.services.ProductoService;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -30,6 +35,9 @@ public class ProductoHandler {
 	
 	@Value("${config.uploads.path}")
 	private String path;
+	
+	@Autowired
+	private Validator validator;
 	
 	public Mono<ServerResponse> crearConFoto(ServerRequest request){
 
@@ -96,14 +104,26 @@ public class ProductoHandler {
 		Mono<Producto> producto = request.bodyToMono(Producto.class);
 		
 		return producto.flatMap(p -> {
-			if(p.getCreateAt()== null) {
-				p.setCreateAt(new Date());
+			
+			Errors errors = new BeanPropertyBindingResult(p, Producto.class.getName());
+			validator.validate(p, errors);
+			
+			if(errors.hasErrors()) {
+				return Flux.fromIterable(errors.getFieldErrors())
+						.map(fieldError -> "El campo " + fieldError.getField() + " " + fieldError.getDefaultMessage())
+						.collectList()
+						.flatMap(list -> ServerResponse.badRequest().body(fromObject(list)));
+			}else {
+				if(p.getCreateAt()== null) {
+					p.setCreateAt(new Date());
+				}
+				return service.save(p).flatMap(pdb -> ServerResponse
+						.created(URI.create("/api/v2/productos".concat(pdb.getId())))
+						.contentType(MediaType.APPLICATION_JSON_UTF8)
+						.body(fromObject(pdb)));
 			}
-			return service.save(p);
-		}).flatMap(p -> ServerResponse
-				.created(URI.create("/api/v2/productos".concat(p.getId())))
-				.contentType(MediaType.APPLICATION_JSON_UTF8)
-				.body(fromObject(p)));
+			
+		});
 	}
 	
 	public Mono<ServerResponse> editar(ServerRequest request){
