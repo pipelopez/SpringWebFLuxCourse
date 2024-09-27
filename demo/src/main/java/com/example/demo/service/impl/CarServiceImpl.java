@@ -6,6 +6,8 @@ import com.example.demo.repository.CarRepository;
 import com.example.demo.repository.entity.CarEntity;
 import com.example.demo.service.CarService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -14,7 +16,8 @@ import reactor.core.publisher.Mono;
 @Service
 public class CarServiceImpl implements CarService {
 
-    private final CarRepository carRepository;
+	@Autowired
+    private CarRepository carRepository;
 
     @Override
     public Mono<CarDto> getCar(Integer carId) {
@@ -24,20 +27,15 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public Mono<CarDto> createCar(CarDto carDto) {
-        return carRepository.save(CarEntity.builder()
-                        .brand(carDto.brand())
-                        .kilowatt(carDto.kilowatt())
-                        .build())
+    	CarEntity carEnt = new CarEntity(carDto.id(), carDto.brand(), carDto.kilowatt());
+        return carRepository.save(carEnt)
                 .map(carEntity -> new CarDto(carEntity.getId(), carEntity.getBrand(), carEntity.getKilowatt()));
     }
 
     @Override
     public Mono<CarDto> updateCar(Integer carId, CarDto carDto) {
-        return carRepository.save(CarEntity.builder()
-                        .id(carId)
-                        .brand(carDto.brand())
-                        .kilowatt(carDto.kilowatt())
-                        .build())
+    	CarEntity carEnt = new CarEntity(carDto.id(), carDto.brand(), carDto.kilowatt());
+        return carRepository.save(carEnt)
                 .map(carEntity -> new CarDto(carEntity.getId(), carEntity.getBrand(), carEntity.getKilowatt()));
     }
 
