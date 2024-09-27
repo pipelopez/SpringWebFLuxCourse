@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.controller.dto.CarDto;
+import com.example.demo.messaging.sender.MQSender;
 import com.example.demo.service.CarService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,15 @@ public class CarController {
 
     @Autowired
     private CarService carService;
+    
+    @Autowired
+    MQSender mqSender;
+    
+    @PostMapping("/message")
+    public String sendMessage(@RequestBody String message) {
+    	mqSender.sendMessage(message);
+    	return "Message published successfully";
+    }
 
     @GetMapping("/{carId}")
     Mono<ResponseEntity<CarDto>> getCar(@PathVariable("carId") Integer carId) {
